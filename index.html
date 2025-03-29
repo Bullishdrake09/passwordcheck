@@ -111,7 +111,7 @@
     let rockyouPasswords = [];
 
     // Load rockyou.txt on page load
-    fetch('rockyou.txt')
+    fetch('https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
