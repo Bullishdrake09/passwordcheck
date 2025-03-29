@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Password Checker with Fast Search</title>
+  <style>
+    /* Import a modern font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #1d2b64, #f8cdda);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    input[type="password"] {
+      width: 80%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="password"]:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #1d2b64;
+      background-color: #f8cdda;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f5b3d1;
+      transform: scale(1.05);
+    }
+
+    #loader {
+      margin-top: 20px;
+      font-style: italic;
+      font-size: 1rem;
+      color: #fffa;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Password Checker</h1>
+    <p>Type in your password to check if it appears in rockyou.txt. Enjoy the cool interface while you secure your account!</p>
+    <input type="password" id="passwordInput" placeholder="Enter your password">
+    <br>
+    <button id="checkButton">Check Password</button>
+    <div id="loader">Loading password list...</div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    let rockyouSet = new Set();
+
+    // Load rockyou.txt on page load and create a Set for fast lookup
+    fetch('rockyou.txt')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then(data => {
+        // Split by newline and trim each entry, then create a Set
+        const passwordsArray = data.split('\n').map(line => line.trim());
+        rockyouSet = new Set(passwordsArray);
+        console.log(`Loaded ${rockyouSet.size} passwords.`);
+        document.getElementById('loader').textContent = "Password list loaded. Ready to search!";
+      })
+      .catch(error => {
+        console.error('Error loading rockyou.txt:', error);
+        document.getElementById('loader').textContent = "Error loading password list.";
+      });
+
+    document.getElementById('checkButton').addEventListener('click', () => {
+      const password = document.getElementById('passwordInput').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!password) {
+        resultDiv.textContent = "Please enter a password.";
+        resultDiv.style.color = 'orange';
+        return;
+      }
+
+      // Check if the password is in the Set
+      if (rockyouSet.has(password)) {
+        resultDiv.textContent = "Warning: Your password was found in rockyou.txt.";
+        resultDiv.style.color = "red";
+      } else {
+        resultDiv.textContent = "Good news: Your password was NOT found in rockyou.txt.";
+        resultDiv.style.color = "green";
+      }
+    });
+  </script>
+</body>
+</html>
